@@ -138,8 +138,8 @@ body {
 .tile {
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 500ms var(--ease-out-quart);
-  transition-delay: calc(var(--col, 0) * 300ms);
+  /* No transition on un-revealed tiles — snaps back instantly, prevents reverse-flip glitch after Play Again */
+  transition: none;
   width: 62px;
   height: 62px;
 }
@@ -153,6 +153,8 @@ body {
 
 .tile[data-revealed] {
   transform: rotateX(180deg);
+  transition: transform 500ms var(--ease-out-quart);
+  transition-delay: calc(var(--col, 0) * 300ms);
 }
 
 .tile-front,
