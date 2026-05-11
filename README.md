@@ -21,4 +21,4 @@ I built this for my mum — she loves Wordle and deserves her own version. 💚
 
 Have fun Mum! 🎉
 
-🔗 [Play here](https://your-vercel-url.vercel.app)
+🔗 [Play here](https://wordle-baksi.vercel.app)
