@@ -16,6 +16,7 @@ import { VALID_GUESSES } from '../data/validGuesses';
 // ---------------------------------------------------------------------------
 
 interface GameState {
+  gameId: number;
   targetWord: string;
   guesses: string[];
   evaluations: LetterState[][];
@@ -105,8 +106,9 @@ function validateHardMode(
   return null;
 }
 
-function buildInitialState(word?: string): GameState {
+function buildInitialState(word?: string, gameId = 0): GameState {
   return {
+    gameId,
     targetWord: word ?? getDailyWord(),
     guesses: [],
     evaluations: [],
@@ -250,13 +252,13 @@ function gameReducer(state: GameState, action: Action): GameState {
     }
 
     case 'NEW_GAME': {
-      return buildInitialState(getNextWord(state.targetWord));
+      return buildInitialState(getNextWord(state.targetWord), state.gameId + 1);
     }
 
     case 'SET_WORD': {
       // Only override if no guesses have been made yet
       if (state.currentRow !== 0 || action.word === state.targetWord) return state;
-      return buildInitialState(action.word);
+      return buildInitialState(action.word, state.gameId);
     }
 
     case 'TOGGLE_HARD_MODE': {

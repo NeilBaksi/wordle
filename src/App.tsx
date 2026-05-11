@@ -82,7 +82,7 @@ function GameApp() {
         justifyContent: 'center',
         overflow: 'hidden',
       }}>
-        <Board />
+        <Board key={state.gameId} />
       </div>
 
       {/* Keyboard — pinned to bottom */}
