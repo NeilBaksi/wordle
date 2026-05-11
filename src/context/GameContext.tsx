@@ -9,7 +9,7 @@ import type { LetterState } from '../types';
 import { evaluateGuess } from '../utils/evaluate';
 import { getDailyWord, getNextWord, recordWordPlayed } from '../utils/dailyWord';
 import { updateStats } from '../utils/storage';
-import { VALID_GUESSES } from '../data/validGuesses';
+import { VALID_GUESSES } from '../data/words';
 
 // ---------------------------------------------------------------------------
 // State & Action types

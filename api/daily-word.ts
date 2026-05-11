@@ -1,4 +1,4 @@
-import { ANSWERS } from '../src/data/answers';
+import { ANSWERS } from '../src/data/words';
 
 export const config = { runtime: 'edge' };
 

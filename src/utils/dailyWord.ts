@@ -1,4 +1,4 @@
-import { ANSWERS } from '../data/answers';
+import { ANSWERS } from '../data/words';
 import { pruneHistory, getHistory, setHistory } from './storage';
 
 export function getTodayString(): string {
