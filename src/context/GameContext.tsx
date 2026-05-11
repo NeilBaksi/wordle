@@ -289,7 +289,7 @@ function gameReducer(state: GameState, action: Action): GameState {
 // Context & Provider
 // ---------------------------------------------------------------------------
 
-export const GameContext = createContext<GameContextValue | null>(null);
+const GameContext = createContext<GameContextValue | null>(null);
 
 interface GameProviderProps {
   children: ReactNode;

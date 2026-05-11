@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { Keyboard } from '../components/Keyboard';
-import { GameProvider, useGame } from '../context/GameContext';
+import { GameProvider } from '../context/GameContext';
 import { ToastProvider } from '../context/ToastContext';
 
 // Mock localStorage
