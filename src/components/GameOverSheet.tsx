@@ -80,6 +80,7 @@ export function GameOverSheet({ isOpen, onClose }: GameOverSheetProps) {
   }, [isOpen]);
 
   const handleNewGame = () => {
+    (document.activeElement as HTMLElement)?.blur();
     dispatch({ type: 'NEW_GAME' });
     onClose();
   };
