@@ -256,8 +256,8 @@ function gameReducer(state: GameState, action: Action): GameState {
     }
 
     case 'SET_WORD': {
-      // Only override if no guesses have been made yet
-      if (state.currentRow !== 0 || action.word === state.targetWord) return state;
+      // Only override on initial load (gameId === 0) before any guesses
+      if (state.gameId !== 0 || state.currentRow !== 0 || action.word === state.targetWord) return state;
       return buildInitialState(action.word, state.gameId);
     }
 
