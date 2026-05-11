@@ -8,6 +8,7 @@ import { ToastContainer } from './components/Toast';
 import { GameOverSheet } from './components/GameOverSheet';
 import { StatsSheet } from './components/StatsSheet';
 import { useKeyboard } from './hooks/useKeyboard';
+import { getTodayString } from './utils/dailyWord';
 
 function GameRoot({ children }: { children: ReactNode }) {
   const { showToast } = useToast();
@@ -15,7 +16,7 @@ function GameRoot({ children }: { children: ReactNode }) {
 }
 
 function GameApp() {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isGameOverOpen, setIsGameOverOpen] = useState(false);
   const [theme, setTheme] = useState<'default' | 'light' | 'sketchbook'>(
@@ -28,6 +29,18 @@ function GameApp() {
   }, [theme]);
 
   useKeyboard();
+
+  // Fetch authoritative daily word from edge function; override local if pre-game
+  useEffect(() => {
+    fetch('/api/daily-word')
+      .then(r => r.json())
+      .then(({ word, date }: { word: string; date: string }) => {
+        if (date === getTodayString()) {
+          dispatch({ type: 'SET_WORD', word });
+        }
+      })
+      .catch(() => {});
+  }, [dispatch]);
 
   // Auto-open GameOver sheet after reveal animation completes
   useEffect(() => {

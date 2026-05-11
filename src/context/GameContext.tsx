@@ -40,7 +40,8 @@ type Action =
   | { type: 'NEW_GAME' }
   | { type: 'TOGGLE_HARD_MODE' }
   | { type: 'CLEAR_TOAST' }
-  | { type: 'HINT' };
+  | { type: 'HINT' }
+  | { type: 'SET_WORD'; word: string };
 
 // ---------------------------------------------------------------------------
 // Context value
@@ -250,6 +251,12 @@ function gameReducer(state: GameState, action: Action): GameState {
 
     case 'NEW_GAME': {
       return buildInitialState(getNextWord(state.targetWord));
+    }
+
+    case 'SET_WORD': {
+      // Only override if no guesses have been made yet
+      if (state.currentRow !== 0 || action.word === state.targetWord) return state;
+      return buildInitialState(action.word);
     }
 
     case 'TOGGLE_HARD_MODE': {

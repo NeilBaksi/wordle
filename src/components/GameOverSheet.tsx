@@ -1,7 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
-import { useToast } from '../context/ToastContext';
-import type { LetterState } from '../types';
 
 const WIN_MESSAGES = [
   'You absolute wordsmith! 🎉',
@@ -12,6 +10,56 @@ const WIN_MESSAGES = [
   'Your ancestors spelled this word so you could solve it today 🏺',
   'Certificate of Wordle Excellence — awarded herein ✨',
   'You played Wordle and society is better for it 🌍',
+  'Was that effortless? Because it looked effortless. 🦋',
+  'Your neurons are elite athletes 🏅',
+  'The letters feared you and they were right 🔤',
+  'Shakespeare would have lost to you today 📜',
+  'Philosophers have debated your intelligence for centuries ⚗️',
+  'You have unlocked the rare "Actually Good at Wordle" achievement 🏆',
+  'Your vocabulary is a public service 🎓',
+  'The word never stood a chance 💀',
+  'Solving this in your sleep would still be impressive 💤',
+  'Even the blank tiles are impressed 🫡',
+  'You have given this grid meaning 🌟',
+  'Dictionary.com wants to be you 📱',
+  'You are the main character of language 🎬',
+  'Your brain is not from this planet 🪐',
+  'In a world of average guessers, you are the exception 🌠',
+  'The Scrabble grandmasters bow to you 🎲',
+  'Bards will sing of this guess for generations 🪕',
+  'You have done the impossible — impressed an algorithm 🤖',
+  'That guess was so clean it should have a theme song 🎵',
+  'Your instincts are frighteningly good 🔮',
+  'Languages are honoured by your participation 🌐',
+  'A moment of silence for the letters you did not even need ⏸️',
+  'Five letters. One legend. You. 🦅',
+  'Are you sure you have not done this before? 👀',
+  'This is what peak performance looks like. Frame it. 🖼️',
+  'GOAT. That is all. 🐐',
+  'The algorithm did not expect this. The algorithm is humbled. 🤯',
+  'Vocabulary enlightenment: achieved 🧘',
+  'The word saw you coming and tried to hide 🫣',
+  'Historical. Legendary. Correct. ✅',
+  'You just made Wordle look easy — it is not easy 😤',
+  'Speed. Precision. Spelling. A dangerous combination. ⚡',
+  'You smell of libraries and winning 📚',
+  'A standing ovation from all 26 letters 👏',
+  'Crossword puzzles are scared of you 🗂️',
+  'You have earned exactly one smug smile today 😏',
+  'If vocabulary were a sport, you would be doping 💊',
+  'Truly alarming levels of competence 🚨',
+  'The English language thanks you for your service 🇬🇧',
+  'Your guesses age like fine wine 🍷',
+  'Solved. Immaculate. No notes. 🎯',
+  'You are built different. Lexically speaking. 🧬',
+  'The squares went green and so did your rivals 🟩',
+  'Vocabulary has never been so well-administered 📋',
+  'Your prefrontal cortex deserves a bonus 💡',
+  'The dictionary shed a single tear of joy 😢',
+  'Wordle has been defeated. Tell your friends. 📣',
+  'You are what happens when curiosity meets spelling 🔍',
+  'If brains were words, yours would be the entire thesaurus 📘',
+  'Zero hesitation. Maximum correctness. Iconic. 🫶',
 ];
 
 interface GameOverSheetProps {
@@ -19,39 +67,17 @@ interface GameOverSheetProps {
   onClose: () => void;
 }
 
-function buildShareText(
-  guesses: string[],
-  evaluations: LetterState[][],
-  gameStatus: string,
-): string {
-  const emojiMap: Record<LetterState, string> = {
-    correct: '🟩',
-    present: '🟨',
-    absent: '⬛',
-    empty: '⬛',
-    active: '⬛',
-  };
-  const guessCount = gameStatus === 'won' ? `${guesses.length}/6` : 'X/6';
-  const grid = evaluations.map(row => row.map(s => emojiMap[s]).join('')).join('\n');
-  return `WORDLE ${guessCount}\n\n${grid}`;
-}
-
 export function GameOverSheet({ isOpen, onClose }: GameOverSheetProps) {
   const { state, dispatch } = useGame();
-  const { showToast } = useToast();
-  const [winMessage] = useState(
+  const [winMessage, setWinMessage] = useState(
     () => WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)],
   );
 
-  const handleShare = useCallback(async () => {
-    const text = buildShareText(state.guesses, state.evaluations, state.gameStatus);
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast('Copied to clipboard!', 2000);
-    } catch {
-      showToast('Could not copy', 1500);
+  useEffect(() => {
+    if (isOpen) {
+      setWinMessage(WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)]);
     }
-  }, [state.guesses, state.evaluations, state.gameStatus, showToast]);
+  }, [isOpen]);
 
   const handleNewGame = () => {
     dispatch({ type: 'NEW_GAME' });
@@ -62,12 +88,6 @@ export function GameOverSheet({ isOpen, onClose }: GameOverSheetProps) {
 
   return (
     <>
-      <div
-        className="backdrop"
-        data-open={isOpen ? 'true' : 'false'}
-        onClick={onClose}
-        aria-hidden="true"
-      />
       <div
         className="sheet"
         data-open={isOpen ? 'true' : 'false'}
@@ -118,7 +138,6 @@ export function GameOverSheet({ isOpen, onClose }: GameOverSheetProps) {
             </>
           ) : (
             <>
-              {/* Show the answer as tiles */}
               <p
                 style={{
                   fontFamily: 'var(--font-ui)',
@@ -181,45 +200,24 @@ export function GameOverSheet({ isOpen, onClose }: GameOverSheetProps) {
             </>
           )}
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <button
-              onClick={handleShare}
-              style={{
-                fontFamily: 'var(--font-ui)',
-                fontWeight: 600,
-                fontSize: '1rem',
-                backgroundColor: 'var(--color-correct)',
-                color: 'oklch(13% 0.008 148)',
-                border: 'none',
-                borderRadius: 8,
-                padding: '14px 24px',
-                cursor: 'pointer',
-                width: '100%',
-                transition: 'opacity 100ms',
-              }}
-            >
-              Share Results
-            </button>
-            <button
-              onClick={handleNewGame}
-              style={{
-                fontFamily: 'var(--font-ui)',
-                fontWeight: 600,
-                fontSize: '1rem',
-                backgroundColor: 'transparent',
-                color: 'var(--color-text)',
-                border: '1px solid var(--color-border-dim)',
-                borderRadius: 8,
-                padding: '14px 24px',
-                cursor: 'pointer',
-                width: '100%',
-                transition: 'border-color 100ms',
-              }}
-            >
-              Play Again
-            </button>
-          </div>
+          <button
+            onClick={handleNewGame}
+            style={{
+              fontFamily: 'var(--font-ui)',
+              fontWeight: 600,
+              fontSize: '1rem',
+              backgroundColor: 'var(--color-correct)',
+              color: 'oklch(13% 0.008 148)',
+              border: 'none',
+              borderRadius: 8,
+              padding: '14px 24px',
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'opacity 100ms',
+            }}
+          >
+            Play Again
+          </button>
         </div>
       </div>
     </>

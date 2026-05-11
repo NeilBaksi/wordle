@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getDailyWord, getTodayString } from '../utils/dailyWord';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { getDailyWord, getNextWord, getTodayString } from '../utils/dailyWord';
 
-// Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
@@ -39,12 +38,19 @@ describe('getDailyWord', () => {
   });
 
   it('excludes recently played words (10-day window)', () => {
-    // Pre-populate history with a word
     const recentHistory = [{ word: getDailyWord(), date: getTodayString() }];
     localStorageMock.setItem('wordle-clone-history', JSON.stringify(recentHistory));
-
-    // The word was just recorded as today's entry, so it should return the same
     const word = getDailyWord();
     expect(word).toHaveLength(5);
+  });
+});
+
+describe('getNextWord', () => {
+  it('returns a different word from the current one', () => {
+    const current = getDailyWord();
+    const next = getNextWord(current);
+    expect(next).not.toBe(current);
+    expect(next).toHaveLength(5);
+    expect(next).toMatch(/^[a-z]+$/);
   });
 });
