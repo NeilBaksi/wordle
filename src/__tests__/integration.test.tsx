@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { GameProvider, useGame } from '../context/GameContext';
 import { ToastProvider } from '../context/ToastContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import { Board } from '../components/Board';
 import { Keyboard } from '../components/Keyboard';
 
@@ -52,7 +53,9 @@ function GameApp() {
 function wrapper({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
-      <GameProvider>{children}</GameProvider>
+      <LanguageProvider>
+        <GameProvider>{children}</GameProvider>
+      </LanguageProvider>
     </ToastProvider>
   );
 }

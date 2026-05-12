@@ -1,14 +1,25 @@
 import { useGame } from '../context/GameContext';
+import { useLang } from '../context/LanguageContext';
+import { STRINGS } from '../i18n/strings';
 import type { LetterState } from '../types';
 
-const ROWS = [
+const ROWS_EN = [
   ['q','w','e','r','t','y','u','i','o','p'],
   ['a','s','d','f','g','h','j','k','l'],
   ['Enter','z','x','c','v','b','n','m','Backspace'],
 ];
 
+const ROWS_ES = [
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['a','s','d','f','g','h','j','k','l','ñ'],
+  ['Enter','z','x','c','v','b','n','m','Backspace'],
+];
+
 export function Keyboard() {
   const { state, dispatch } = useGame();
+  const { lang } = useLang();
+  const ROWS = lang === 'es' ? ROWS_ES : ROWS_EN;
+  const strings = STRINGS[lang];
 
   function handleKey(key: string) {
     if (state.gameStatus !== 'playing' || state.isRevealing) return;
@@ -58,7 +69,7 @@ export function Keyboard() {
             onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
             aria-label="Get a hint"
           >
-            Hint
+            {strings.hintButton}
           </button>
         </div>
       )}
@@ -79,7 +90,7 @@ export function Keyboard() {
                 aria-label={key === 'Backspace' ? 'Delete' : key}
                 onClick={() => handleKey(key)}
               >
-                {key === 'Backspace' ? '⌫' : key === 'Enter' ? 'ENTER' : key.toUpperCase()}
+                {key === 'Backspace' ? '⌫' : key === 'Enter' ? strings.enterKey : key.toUpperCase()}
               </button>
             );
           })}

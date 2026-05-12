@@ -15,7 +15,7 @@ export function useKeyboard() {
         dispatch({ type: 'SUBMIT' });
       } else if (key === 'Backspace' || key === 'Delete') {
         dispatch({ type: 'DELETE' });
-      } else if (/^[a-zA-Z]$/.test(key)) {
+      } else if (/^[a-zA-ZñÑ]$/.test(key)) {
         dispatch({ type: 'TYPE', letter: key.toLowerCase() });
       }
     }

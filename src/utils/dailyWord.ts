@@ -1,4 +1,5 @@
-import { ANSWERS } from '../data/words';
+import type { Lang } from '../i18n/strings';
+import { ANSWERS, ANSWERS_ES } from '../data/words';
 import { pruneHistory, getHistory, setHistory } from './storage';
 
 export function getTodayString(): string {
@@ -15,25 +16,27 @@ function dateHash(dateStr: string): number {
   return Math.abs(hash);
 }
 
-export function getDailyWord(): string {
+export function getDailyWord(lang: Lang = 'en'): string {
   pruneHistory();
   const history = getHistory();
   const today = getTodayString();
+  const answers = lang === 'es' ? ANSWERS_ES : ANSWERS;
 
   const todayEntry = history.find(h => h.date === today);
   if (todayEntry) return todayEntry.word;
 
   const recentWords = new Set(history.map(h => h.word));
-  const pool = ANSWERS.filter(w => !recentWords.has(w));
-  const idx = dateHash(today) % (pool.length || ANSWERS.length);
-  return (pool.length > 0 ? pool : ANSWERS)[idx];
+  const pool = answers.filter(w => !recentWords.has(w));
+  const idx = dateHash(today) % (pool.length || answers.length);
+  return (pool.length > 0 ? pool : answers)[idx];
 }
 
-export function getNextWord(currentWord: string): string {
+export function getNextWord(currentWord: string, lang: Lang = 'en'): string {
   const history = getHistory();
+  const answers = lang === 'es' ? ANSWERS_ES : ANSWERS;
   const recentWords = new Set(history.map(h => h.word));
-  const pool = ANSWERS.filter(w => !recentWords.has(w) && w !== currentWord);
-  const arr = pool.length > 0 ? pool : ANSWERS.filter(w => w !== currentWord);
+  const pool = answers.filter(w => !recentWords.has(w) && w !== currentWord);
+  const arr = pool.length > 0 ? pool : answers.filter(w => w !== currentWord);
   return arr[Math.floor(Math.random() * arr.length)];
 }
 

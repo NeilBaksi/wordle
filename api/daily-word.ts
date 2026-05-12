@@ -1,4 +1,4 @@
-import { ANSWERS } from '../src/data/words';
+import { ANSWERS, ANSWERS_ES } from '../src/data/words';
 
 export const config = { runtime: 'edge' };
 
@@ -10,11 +10,14 @@ function dateHash(s: string): number {
   return Math.abs(h);
 }
 
-export default function handler(): Response {
+export default function handler(req: Request): Response {
+  const url = new URL(req.url);
+  const lang = url.searchParams.get('lang') === 'es' ? 'es' : 'en';
+  const answers = lang === 'es' ? ANSWERS_ES : ANSWERS;
   const today = new Date().toISOString().slice(0, 10);
-  const word = ANSWERS[dateHash(today) % ANSWERS.length];
+  const word = answers[dateHash(today) % answers.length];
   return Response.json(
-    { word, date: today },
+    { word, date: today, lang },
     { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } },
   );
 }

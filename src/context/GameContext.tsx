@@ -6,10 +6,12 @@ import {
   type ReactNode,
 } from 'react';
 import type { LetterState } from '../types';
+import type { Lang } from '../i18n/strings';
+import { STRINGS } from '../i18n/strings';
 import { evaluateGuess } from '../utils/evaluate';
 import { getDailyWord, getNextWord, recordWordPlayed } from '../utils/dailyWord';
 import { updateStats } from '../utils/storage';
-import { VALID_GUESSES } from '../data/words';
+import { VALID_GUESSES, VALID_GUESSES_ES } from '../data/words';
 
 // ---------------------------------------------------------------------------
 // State & Action types
@@ -30,6 +32,7 @@ interface GameState {
   pendingToast: string | null;
   hintLetter: string | null;
   hintUsed: boolean;
+  lang: Lang;
 }
 
 type Action =
@@ -42,7 +45,8 @@ type Action =
   | { type: 'TOGGLE_HARD_MODE' }
   | { type: 'CLEAR_TOAST' }
   | { type: 'HINT' }
-  | { type: 'SET_WORD'; word: string };
+  | { type: 'SET_WORD'; word: string }
+  | { type: 'SET_LANG'; lang: Lang };
 
 // ---------------------------------------------------------------------------
 // Context value
@@ -79,7 +83,9 @@ function validateHardMode(
   currentInput: string,
   guesses: string[],
   evaluations: LetterState[][],
+  lang: Lang,
 ): string | null {
+  const s = STRINGS[lang];
   for (let row = 0; row < guesses.length; row++) {
     const word = guesses[row];
     const eval_ = evaluations[row];
@@ -88,8 +94,8 @@ function validateHardMode(
     for (let col = 0; col < 5; col++) {
       if (eval_[col] === 'correct') {
         if (currentInput[col] !== word[col]) {
-          const pos = ['1st', '2nd', '3rd', '4th', '5th'][col];
-          return `${pos} letter must be ${word[col].toUpperCase()}`;
+          const pos = s.hardModePositions[col];
+          return s.hardModeCorrect(pos, word[col]);
         }
       }
     }
@@ -98,7 +104,7 @@ function validateHardMode(
     for (let col = 0; col < 5; col++) {
       if (eval_[col] === 'present') {
         if (!currentInput.includes(word[col])) {
-          return `Guess must contain ${word[col].toUpperCase()}`;
+          return s.hardModePresent(word[col]);
         }
       }
     }
@@ -106,10 +112,10 @@ function validateHardMode(
   return null;
 }
 
-function buildInitialState(word?: string, gameId = 0): GameState {
+function buildInitialState(word?: string, gameId = 0, lang: Lang = 'en'): GameState {
   return {
     gameId,
-    targetWord: word ?? getDailyWord(),
+    targetWord: word ?? getDailyWord(lang),
     guesses: [],
     evaluations: [],
     currentInput: '',
@@ -122,6 +128,7 @@ function buildInitialState(word?: string, gameId = 0): GameState {
     pendingToast: null,
     hintLetter: null,
     hintUsed: false,
+    lang,
   };
 }
 
@@ -157,16 +164,16 @@ function gameReducer(state: GameState, action: Action): GameState {
         return {
           ...state,
           invalidRow: state.currentRow,
-          pendingToast: 'Not enough letters',
+          pendingToast: STRINGS[state.lang].notEnoughLetters,
         };
       }
 
       // Must be a valid word
-      if (!VALID_GUESSES.has(input)) {
+      if (!(state.lang === 'es' ? VALID_GUESSES_ES : VALID_GUESSES).has(input)) {
         return {
           ...state,
           invalidRow: state.currentRow,
-          pendingToast: 'Not in word list',
+          pendingToast: STRINGS[state.lang].notInWordList,
         };
       }
 
@@ -176,6 +183,7 @@ function gameReducer(state: GameState, action: Action): GameState {
           input,
           state.guesses,
           state.evaluations,
+          state.lang,
         );
         if (hardModeError) {
           return {
@@ -252,7 +260,11 @@ function gameReducer(state: GameState, action: Action): GameState {
     }
 
     case 'NEW_GAME': {
-      return buildInitialState(getNextWord(state.targetWord), state.gameId + 1);
+      return buildInitialState(getNextWord(state.targetWord, state.lang), state.gameId + 1, state.lang);
+    }
+
+    case 'SET_LANG': {
+      return buildInitialState(undefined, 0, action.lang);
     }
 
     case 'SET_WORD': {
@@ -294,10 +306,11 @@ const GameContext = createContext<GameContextValue | null>(null);
 interface GameProviderProps {
   children: ReactNode;
   showToast?: (message: string, duration?: number) => void;
+  lang?: Lang;
 }
 
-export function GameProvider({ children, showToast }: GameProviderProps) {
-  const [state, dispatch] = useReducer(gameReducer, undefined, buildInitialState);
+export function GameProvider({ children, showToast, lang = 'en' }: GameProviderProps) {
+  const [state, dispatch] = useReducer(gameReducer, undefined, () => buildInitialState(undefined, 0, lang));
 
   // Auto-clear isRevealing after flip animation completes
   // 5 tiles × 300ms stagger + 500ms flip duration = 2000ms total

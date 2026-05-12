@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useGame } from '../context/GameContext';
+import { useLang } from '../context/LanguageContext';
+import { STRINGS } from '../i18n/strings';
 import { getStats } from '../utils/storage';
 import type { GameStats } from '../types';
 
@@ -86,6 +88,8 @@ function HowToPlayRow({
 
 export function StatsSheet({ isOpen, onClose, theme, onSetTheme }: StatsSheetProps) {
   const { state, dispatch } = useGame();
+  const { lang, setLang } = useLang();
+  const s = STRINGS[lang];
   const [stats, setStats] = useState<GameStats>(() => getStats());
 
   // Refresh stats whenever the sheet opens so new wins/losses are reflected.
@@ -283,6 +287,47 @@ export function StatsSheet({ isOpen, onClose, theme, onSetTheme }: StatsSheetPro
               Settings
             </h2>
 
+            {/* Language toggle */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingBottom: 20,
+              marginBottom: 20,
+              borderBottom: '1px solid var(--color-border-dim)',
+            }}>
+              <div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text)' }}>
+                  {s.settingsLang}
+                </div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: '0.75rem', color: 'var(--color-muted)', marginTop: 2 }}>
+                  {s.settingsLangDesc}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--color-border-dim)' }}>
+                {(['en', 'es'] as const).map(l => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    aria-pressed={lang === l}
+                    style={{
+                      fontFamily: 'var(--font-ui)',
+                      fontWeight: 700,
+                      fontSize: '0.8rem',
+                      padding: '6px 14px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: lang === l ? 'var(--color-correct)' : 'transparent',
+                      color: lang === l ? 'oklch(13% 0.008 148)' : 'var(--color-text)',
+                      transition: 'background-color 150ms',
+                    }}
+                  >
+                    {l.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div
               style={{
                 display: 'flex',
@@ -300,7 +345,7 @@ export function StatsSheet({ isOpen, onClose, theme, onSetTheme }: StatsSheetPro
                     fontSize: '0.9375rem',
                   }}
                 >
-                  Hard Mode
+                  {s.settingsHardMode}
                 </div>
                 <div
                   style={{
@@ -310,7 +355,7 @@ export function StatsSheet({ isOpen, onClose, theme, onSetTheme }: StatsSheetPro
                     marginTop: 2,
                   }}
                 >
-                  Revealed hints must be used in subsequent guesses
+                  {s.settingsHardModeDesc}
                 </div>
               </div>
               {/* Toggle */}
@@ -434,7 +479,7 @@ export function StatsSheet({ isOpen, onClose, theme, onSetTheme }: StatsSheetPro
                 margin: '0 0 12px',
               }}
             >
-              How to Play
+              {s.howToPlayTitle}
             </h2>
 
             <p
@@ -446,33 +491,26 @@ export function StatsSheet({ isOpen, onClose, theme, onSetTheme }: StatsSheetPro
                 margin: '0 0 16px',
               }}
             >
-              Guess the word in 6 tries. After each guess, the color of the tiles
-              will change to show how close your guess was.
+              {s.howToPlayGuess}
             </p>
 
             <HowToPlayRow
-              word="WEARY"
+              word={s.exampleCorrectWord}
               highlightIndex={0}
               highlightColor="var(--color-correct)"
-              label={
-                'W is in the word and in the correct spot.'
-              }
+              label={s.exampleCorrectDesc}
             />
             <HowToPlayRow
-              word="PILLS"
+              word={s.examplePresentWord}
               highlightIndex={1}
               highlightColor="var(--color-present)"
-              label={
-                'I is in the word but in the wrong spot.'
-              }
+              label={s.examplePresentDesc}
             />
             <HowToPlayRow
-              word="VAGUE"
+              word={s.exampleAbsentWord}
               highlightIndex={3}
               highlightColor="var(--color-absent)"
-              label={
-                'U is not in the word in any spot.'
-              }
+              label={s.exampleAbsentDesc}
             />
           </div>
 

@@ -1,66 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
-
-const WIN_MESSAGES = [
-  'You absolute wordsmith! 🎉',
-  'That big brain energy is unmatched 🧠',
-  'Webster called — he wants tips 📖',
-  'Linguistic royalty detected 👑',
-  'Statistically improbable. Empirically impressive. 📊',
-  'Your ancestors spelled this word so you could solve it today 🏺',
-  'Certificate of Wordle Excellence — awarded herein ✨',
-  'You played Wordle and society is better for it 🌍',
-  'Was that effortless? Because it looked effortless. 🦋',
-  'Your neurons are elite athletes 🏅',
-  'The letters feared you and they were right 🔤',
-  'Shakespeare would have lost to you today 📜',
-  'Philosophers have debated your intelligence for centuries ⚗️',
-  'You have unlocked the rare "Actually Good at Wordle" achievement 🏆',
-  'Your vocabulary is a public service 🎓',
-  'The word never stood a chance 💀',
-  'Solving this in your sleep would still be impressive 💤',
-  'Even the blank tiles are impressed 🫡',
-  'You have given this grid meaning 🌟',
-  'Dictionary.com wants to be you 📱',
-  'You are the main character of language 🎬',
-  'Your brain is not from this planet 🪐',
-  'In a world of average guessers, you are the exception 🌠',
-  'The Scrabble grandmasters bow to you 🎲',
-  'Bards will sing of this guess for generations 🪕',
-  'You have done the impossible — impressed an algorithm 🤖',
-  'That guess was so clean it should have a theme song 🎵',
-  'Your instincts are frighteningly good 🔮',
-  'Languages are honoured by your participation 🌐',
-  'A moment of silence for the letters you did not even need ⏸️',
-  'Five letters. One legend. You. 🦅',
-  'Are you sure you have not done this before? 👀',
-  'This is what peak performance looks like. Frame it. 🖼️',
-  'GOAT. That is all. 🐐',
-  'The algorithm did not expect this. The algorithm is humbled. 🤯',
-  'Vocabulary enlightenment: achieved 🧘',
-  'The word saw you coming and tried to hide 🫣',
-  'Historical. Legendary. Correct. ✅',
-  'You just made Wordle look easy — it is not easy 😤',
-  'Speed. Precision. Spelling. A dangerous combination. ⚡',
-  'You smell of libraries and winning 📚',
-  'A standing ovation from all 26 letters 👏',
-  'Crossword puzzles are scared of you 🗂️',
-  'You have earned exactly one smug smile today 😏',
-  'If vocabulary were a sport, you would be doping 💊',
-  'Truly alarming levels of competence 🚨',
-  'The English language thanks you for your service 🇬🇧',
-  'Your guesses age like fine wine 🍷',
-  'Solved. Immaculate. No notes. 🎯',
-  'You are built different. Lexically speaking. 🧬',
-  'The squares went green and so did your rivals 🟩',
-  'Vocabulary has never been so well-administered 📋',
-  'Your prefrontal cortex deserves a bonus 💡',
-  'The dictionary shed a single tear of joy 😢',
-  'Wordle has been defeated. Tell your friends. 📣',
-  'You are what happens when curiosity meets spelling 🔍',
-  'If brains were words, yours would be the entire thesaurus 📘',
-  'Zero hesitation. Maximum correctness. Iconic. 🫶',
-];
+import { useLang } from '../context/LanguageContext';
+import { WIN_MESSAGES } from '../i18n/strings';
 
 interface GameOverSheetProps {
   isOpen: boolean;
@@ -69,15 +10,16 @@ interface GameOverSheetProps {
 
 export function GameOverSheet({ isOpen, onClose }: GameOverSheetProps) {
   const { state, dispatch } = useGame();
+  const { lang } = useLang();
   const [winMessage, setWinMessage] = useState(
-    () => WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)],
+    () => WIN_MESSAGES[lang][Math.floor(Math.random() * WIN_MESSAGES[lang].length)],
   );
 
   useEffect(() => {
     if (isOpen) {
-      setWinMessage(WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)]);
+      setWinMessage(WIN_MESSAGES[lang][Math.floor(Math.random() * WIN_MESSAGES[lang].length)]);
     }
-  }, [isOpen]);
+  }, [isOpen, lang]);
 
   const handleNewGame = () => {
     (document.activeElement as HTMLElement)?.blur();

@@ -1,6 +1,7 @@
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { GameProvider, useGame } from './context/GameContext';
+import { LanguageProvider, useLang } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { Board } from './components/Board';
 import { Keyboard } from './components/Keyboard';
@@ -12,11 +13,14 @@ import { getTodayString } from './utils/dailyWord';
 
 function GameRoot({ children }: { children: ReactNode }) {
   const { showToast } = useToast();
-  return <GameProvider showToast={showToast}>{children}</GameProvider>;
+  const { lang } = useLang();
+  return <GameProvider showToast={showToast} lang={lang}>{children}</GameProvider>;
 }
 
 function GameApp() {
   const { state, dispatch } = useGame();
+  const { lang } = useLang();
+  const prevLangRef = useRef<string>(lang);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isGameOverOpen, setIsGameOverOpen] = useState(false);
   const [theme, setTheme] = useState<'default' | 'light' | 'sketchbook'>(
@@ -28,11 +32,18 @@ function GameApp() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    if (prevLangRef.current !== lang) {
+      prevLangRef.current = lang;
+      dispatch({ type: 'SET_LANG', lang });
+    }
+  }, [lang, dispatch]);
+
   useKeyboard();
 
   // Fetch authoritative daily word from edge function; override local if pre-game
   useEffect(() => {
-    fetch('/api/daily-word')
+    fetch(`/api/daily-word?lang=${state.lang}`)
       .then(r => r.json())
       .then(({ word, date }: { word: string; date: string }) => {
         if (date === getTodayString()) {
@@ -40,6 +51,7 @@ function GameApp() {
         }
       })
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   // Auto-open GameOver sheet after reveal animation completes
@@ -108,9 +120,11 @@ function GameApp() {
 export default function App() {
   return (
     <ToastProvider>
-      <GameRoot>
-        <GameApp />
-      </GameRoot>
+      <LanguageProvider>
+        <GameRoot>
+          <GameApp />
+        </GameRoot>
+      </LanguageProvider>
     </ToastProvider>
   );
 }

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Keyboard } from '../components/Keyboard';
 import { GameProvider } from '../context/GameContext';
 import { ToastProvider } from '../context/ToastContext';
+import { LanguageProvider } from '../context/LanguageContext';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -20,7 +21,9 @@ Object.defineProperty(global, 'localStorage', { value: localStorageMock });
 function wrapper({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
-      <GameProvider>{children}</GameProvider>
+      <LanguageProvider>
+        <GameProvider>{children}</GameProvider>
+      </LanguageProvider>
     </ToastProvider>
   );
 }

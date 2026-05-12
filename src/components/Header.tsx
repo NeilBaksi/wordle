@@ -1,4 +1,6 @@
 import { useGame } from '../context/GameContext';
+import { useLang } from '../context/LanguageContext';
+import { STRINGS } from '../i18n/strings';
 
 interface HeaderProps {
   onInfoOpen: () => void;
@@ -6,6 +8,7 @@ interface HeaderProps {
 
 export function Header({ onInfoOpen }: HeaderProps) {
   const { state } = useGame();
+  const { lang } = useLang();
 
   return (
     <header style={{
@@ -44,7 +47,7 @@ export function Header({ onInfoOpen }: HeaderProps) {
             padding: '2px 8px',
             borderRadius: 999,
           }}>
-            HARD
+            {STRINGS[lang].hardModeBadge}
           </span>
         )}
       </div>
