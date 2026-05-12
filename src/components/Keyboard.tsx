@@ -74,7 +74,7 @@ export function Keyboard() {
             return (
               <button
                 key={key}
-                className={`key${isSpecial ? ' key-wide' : ''}`}
+                className={`key${isSpecial ? ' key-wide' : ''}${key === 'Enter' ? ' key-enter' : ''}`}
                 data-state={isHint ? 'hint' : keyState}
                 aria-label={key === 'Backspace' ? 'Delete' : key}
                 onClick={() => handleKey(key)}

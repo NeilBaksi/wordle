@@ -342,6 +342,11 @@ body {
   letter-spacing: 0.02em;
 }
 
+.key-enter {
+  background-color: var(--color-correct);
+  color: oklch(13% 0.008 148);
+}
+
 .key[data-state="hint"] {
   background-color: var(--color-hint);
   color: oklch(13% 0.008 295);
